@@ -2,7 +2,8 @@
 
 **[English](#english) | [العربية](#العربية)**
 
-![Screenshot](screenshot.png)
+![Screenshot]<img width="949" height="435" alt="لقطة شاشة 2026-10-11 214408" src="https://github.com/user-attachments/assets/4bc206cf-3efc-4094-ae5f-e3cb4be59509" />
+
 
 ---
 
