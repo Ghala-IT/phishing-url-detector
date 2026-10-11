@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>كاشف روابط التصيد | Phishing URL Detector</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f7;--card:#fff;--ink:#12262b;--mute:#5d737a;--line:#d9e4e7;--acc:#0b7a8a;--ok:#0f9d78;--bad:#d6395a;--warn:#c98a0a;--code:#e9f1f3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a1e;--card:#14272d;--ink:#e6f1f3;--mute:#8fa9b0;--line:#244048;--acc:#4fd1e3;--ok:#34d3a3;--bad:#ff6b8a;--warn:#f0b43c;--code:#0a1418}}
+:root[data-theme="dark"]{--bg:#0d1a1e;--card:#14272d;--ink:#e6f1f3;--mute:#8fa9b0;--line:#244048;--acc:#4fd1e3;--ok:#34d3a3;--bad:#ff6b8a;--warn:#f0b43c;--code:#0a1418}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;line-height:1.7}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,Consolas,monospace}
+header{padding:28px 18px 8px;max-width:920px;margin:auto}
+h1{margin:0;font-size:1.7rem;line-height:1.3}
+h1 small{display:block;font-size:.9rem;font-weight:400;color:var(--mute);direction:ltr;text-align:right;margin-top:4px}
+.sub{color:var(--mute);margin:8px 0 0}
+nav{display:flex;gap:6px;max-width:920px;margin:14px auto 0;padding:0 18px;overflow-x:auto}
+nav button{border:1px solid var(--line);background:transparent;color:var(--mute);padding:8px 16px;border-radius:999px;font:inherit;cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{background:var(--acc);border-color:var(--acc);color:var(--bg)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+main{max-width:920px;margin:16px auto 40px;padding:0 18px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:1.1rem}
+.row{display:flex;gap:10px}
+input[type=text]{flex:1;min-width:0;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;direction:ltr;text-align:left}
+.btn{border:0;background:var(--acc);color:var(--bg);padding:12px 20px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chips button{border:1px dashed var(--line);background:transparent;color:var(--mute);padding:5px 12px;border-radius:8px;font:inherit;font-size:.82rem;cursor:pointer;direction:ltr}
+.gauge{display:flex;align-items:center;gap:16px}
+.ring{--p:0;--c:var(--mute);flex:none;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;transition:.4s}
+.ring b{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:1.5rem}
+.gauge h3{margin:0;font-size:1.15rem}.gauge p{margin:2px 0 0;color:var(--mute);font-size:.9rem}
+.anat{direction:ltr;text-align:left;background:var(--code);border-radius:10px;padding:12px;font-size:.84rem;word-break:break-all;margin-top:12px}
+.anat span{padding:1px 4px;border-radius:4px}
+.a-p{background:color-mix(in srgb,var(--mute) 25%,transparent)}.a-s{background:color-mix(in srgb,var(--warn) 30%,transparent)}.a-d{background:color-mix(in srgb,var(--ok) 30%,transparent)}.a-r{background:color-mix(in srgb,var(--acc) 22%,transparent)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.76rem;color:var(--mute);margin-top:8px}
+ul.f{list-style:none;margin:0;padding:0}
+ul.f li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}ul.f li:last-child{border:0}
+.pt{flex:none;min-width:42px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:#fff;background:var(--bad)}
+.pt.z{background:var(--ok)}.pt.m{background:var(--warn)}
+ul.f b{display:block}ul.f span{color:var(--mute);font-size:.86rem}
+pre{background:var(--code);padding:14px;border-radius:10px;overflow-x:auto;direction:ltr;text-align:left;font-size:.8rem;line-height:1.6;margin:0}
+.hint{color:var(--mute);font-size:.86rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.9rem}.tbl td,.tbl th{padding:8px;border-bottom:1px solid var(--line);text-align:right}
+.flow{display:grid;gap:8px}.flow div{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.flow div:not(:last-child)::after{content:"↓";display:block;text-align:center;color:var(--acc);margin-top:6px}
+p{margin:.4em 0}
+footer{max-width:920px;margin:0 auto 30px;padding:16px 18px;border-top:1px solid var(--line);color:var(--mute);font-size:.84rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>كاشف روابط التصيد<small>Phishing URL Detector</small></h1>
+  <p class="sub">الصقي رابط مشبوه وتحصلين على تقييم خطورة مع شرح كل مؤشر. التحليل كله داخل المتصفح، ولا يُفتح الرابط ولا يُرسل لأي جهة.</p>
+</header>
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-t="scan">التحليل</button>
+  <button role="tab" aria-selected="false" data-t="idea">عن الأداة</button>
+  </nav>
+<main>
+<section id="scan" class="on">
+  <div class="card">
+    <h2>الرابط المراد فحصه</h2>
+    <div class="row">
+      <input id="u" type="text" autocomplete="off" spellcheck="false" placeholder="https://example.com/login" aria-label="الرابط">
+      <button class="btn" id="go">افحصي</button>
+    </div>
+    <div class="chips" id="ex"></div>
+    <p class="hint" style="margin-top:10px">الأمثلة نصوص تجريبية صُنعت للتدريب، لا تفتحيها.</p>
+  </div>
+  <div class="card" id="res" hidden>
+    <div class="gauge"><div class="ring" id="ring"><b id="sc">0</b></div><div><h3 id="vt"></h3><p id="vd"></p></div></div>
+    <div class="anat" id="anat"></div>
+    <div class="legend"><span class="a-p">البروتوكول</span><span class="a-s">النطاق الفرعي</span><span class="a-d">النطاق الأساسي</span><span class="a-r">المسار</span></div>
+  </div>
+  <div class="card" id="fc" hidden>
+    <h2>المؤشرات المكتشفة</h2>
+    <ul class="f" id="fl"></ul>
+  </div>
+</section>
+
+<section id="idea">
+  <div class="card"><h2>الفكرة</h2>
+    <p>التصيد (Phishing) يعتمد على رابط يشبه رابط جهة موثوقة لكنه يقودك لموقع مزيف يسرق بياناتك. الأداة تحلل شكل الرابط نفسه وتبحث عن العلامات التي يتركها المحتال، وتعطي نقاط خطورة من 0 إلى 100 مع تفسير كل نقطة.</p></div>
+  <div class="card"><h2>مسار العمل</h2>
+    <div class="flow">
+      <div><b>1. التفكيك</b><p class="hint">تقسيم الرابط إلى بروتوكول، نطاق فرعي، نطاق أساسي، مسار، ومنفذ.</p></div>
+      <div><b>2. استخراج المؤشرات</b><p class="hint">كل مؤشر دالة صغيرة تعيد نقاطاً وسبباً.</p></div>
+      <div><b>3. التجميع</b><p class="hint">مجموع النقاط (حده 100) يحدد التصنيف.</p></div>
+      <div><b>4. العرض</b><p class="hint">الواجهة تبين النتيجة وتلوّن أجزاء الرابط وتشرح السبب.</p></div>
+    </div></div>
+  <div class="card"><h2>المؤشرات المستخدمة</h2>
+    <table class="tbl">
+      <tr><th>المؤشر</th><th>لماذا مهم</th></tr>
+      <tr><td>انتحال علامة تجارية</td><td>مثل paypa1 أو rajhi-bank بدل النطاق الرسمي</td></tr>
+      <tr><td>اسم علامة في النطاق الفرعي</td><td>stcpay.verify-now.xyz النطاق الحقيقي هو verify-now.xyz</td></tr>
+      <tr><td>عنوان IP بدل اسم</td><td>المواقع الرسمية نادراً تستخدمه</td></tr>
+      <tr><td>رمز @ داخل الرابط</td><td>ما قبله يُتجاهل، ويخفي الوجهة الحقيقية</td></tr>
+      <tr><td>Punycode (xn--)</td><td>أحرف تبدو مثل اللاتينية لكنها من لغة أخرى</td></tr>
+      <tr><td>كلمات مثل verify وlogin</td><td>تستعمل لاستعجال الضحية</td></tr>
+      <tr><td>نطاق علوي رخيص، أو رابط مختصر</td><td>يُستخدم كثيراً لإخفاء المصدر</td></tr>
+    </table></div>
+  <div class="card"><h2>حدود الأداة</h2>
+    <p>هذي قواعد استدلالية (Heuristics) تحلل شكل الرابط فقط. موقع نظيف قد ياخذ نقاط، وموقع تصيد متقن قد يمر. لا تعتبرينها حكماً نهائياً.</p>
+    <p class="hint">تطويرها: تدريب نموذج ML على بيانات مثل PhishTank، فحص التاريخ عبر WHOIS، فحص السمعة عبر Google Safe Browsing API. وللـ LinkedIn: انشري مقارنة بين نتائج القواعد ونتائج النموذج.</p></div>
+</section>
+
+</main>
+<footer>مشروع تعليمي في الأمن السيبراني. التحليل يتم بالكامل داخل متصفحك، ولا يُفتح الرابط ولا يُحفظ. النتائج استدلالية وليست حكماً نهائياً.</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const BRANDS=['paypal','google','apple','microsoft','amazon','facebook','instagram','netflix','whatsapp','alrajhibank','alahli','stcpay','absher','nafath','tabby','aramex','naqel','tawakkalna','binance','alinma','riyadbank','mobily','jarir','tamara','jahez','hungerstation','najiz','sadad'];
+const KW=['login','signin','verify','secure','account','update','confirm','password','bank','wallet','billing','suspend','unlock','otp','refund','gift','claim'];
+const RISKY=['xyz','top','tk','ml','ga','cf','gq','click','zip','mov','icu','cyou','buzz','rest','work','support','live'];
+const SHORT=['bit.ly','tinyurl.com','t.co','goo.gl','is.gd','cutt.ly','rb.gy','shorturl.at','ow.ly'];
+const SLD=['com','co','gov','edu','org','net','med','sch'];
+const EX=['https://www.google.com/search?q=cats','http://paypa1-secure-login.xyz/verify/account','https://stcpay.verify-now.top/otp','http://192.168.4.7/alrajhibank/login','https://secure.login@evil-site.click/update','https://bit.ly/3xYz12'];
+const lev=(a,b)=>{const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]};
+const unleet=(s,one)=>s.replace(/0/g,'o').replace(/1/g,one).replace(/3/g,'e').replace(/5/g,'s').replace(/@/g,'a');
+function parse(raw){
+  let had=/^[a-z][a-z0-9+.-]*:\/\//i.test(raw);
+  const u=new URL(had?raw:'https://'+raw);
+  const host=u.hostname.toLowerCase(),labels=host.split('.');
+  const isIP=/^\d{1,3}(\.\d{1,3}){3}$/.test(host);
+  let n=2;if(labels.length>=3&&labels[labels.length-1].length===2&&SLD.includes(labels[labels.length-2]))n=3;
+  const reg=isIP?host:labels.slice(-n).join('.');
+  const sub=isIP?'':labels.slice(0,-n).join('.');
+  return{u,had,host,isIP,reg,sub,tld:labels[labels.length-1],main:labels[labels.length-n]||host};
+}
+function analyze(raw){
+  const p=parse(raw),F=[],add=(pts,t,d)=>F.push({pts,t,d});
+  if(p.had&&p.u.protocol==='http:')add(15,'اتصال غير مشفر (HTTP)','المواقع الجادة تستخدم HTTPS، لكن HTTPS وحده لا يثبت أن الموقع آمن.');
+  if(p.isIP)add(30,'عنوان IP بدل اسم نطاق','المواقع الرسمية نادراً تُفتح بعنوان رقمي.');
+  if(p.u.username||p.u.password)add(25,'رمز @ داخل الرابط','المتصفح يتجاهل ما قبل @ ويذهب للنطاق الذي بعده: '+p.host);
+  if(p.host.includes('xn--'))add(25,'نطاق Punycode','قد يحتوي أحرفاً تشبه اللاتينية لكنها من لغة أخرى.');
+  if(raw.length>75)add(10,'رابط طويل جداً ('+raw.length+' حرف)','الطول يُستخدم لإخفاء النطاق الحقيقي.');
+  const sl=p.sub?p.sub.split('.').length:0;
+  if(sl>=3)add(12,'نطاقات فرعية كثيرة ('+sl+')','يُستخدم لإضافة أسماء توحي بالثقة قبل النطاق الحقيقي.');
+  const hy=(p.main.match(/-/g)||[]).length;
+  if(hy>=2)add(10,'شرطات كثيرة في النطاق','مثل secure-bank-login.');else if(hy===1)add(5,'شرطة في اسم النطاق','شائعة في النطاقات المنتحلة.');
+  if(p.port=p.u.port,p.u.port&&!['80','443'].includes(p.u.port))add(10,'منفذ غير معتاد ('+p.u.port+')','المواقع العادية تستخدم 80 أو 443.');
+  if(/^\/\/|[^:]\/\//.test(p.u.pathname+p.u.search))add(8,'// مكررة داخل المسار','قد تدل على إعادة توجيه.');
+  if(RISKY.includes(p.tld))add(12,'نطاق علوي كثير الاستغلال (.'+p.tld+')','رخيص ويكثر في الحملات الاحتيالية.');
+  if(SHORT.includes(p.reg))add(15,'رابط مختصر','لا يمكن معرفة الوجهة الحقيقية قبل فتحه.');
+  const all=(p.host+p.u.pathname+p.u.search).toLowerCase();
+  const kws=KW.filter(k=>all.includes(k));
+  if(kws.length)add(Math.min(18,kws.length*6),'كلمات استعجال أو دخول: '+kws.join(', '),'تُستخدم لدفعك لإدخال بياناتك.');
+  if(!p.isIP){
+    const clean=[p.main,unleet(p.main,'l'),unleet(p.main,'i')].map(x=>x.replace(/-/g,''));
+    const parts=p.main.split('-').flatMap(x=>[x,unleet(x,'l'),unleet(x,'i')]);
+    let hit=null;
+    for(const b of BRANDS){
+      if(p.main===b)continue;
+      if(clean.some(c=>c===b||(c.length>4&&lev(c,b)<=1))||parts.some(x=>x===b)){hit={b,t:'look'};break}
+      if(clean.some(c=>c.includes(b))){hit={b,t:'incl'};break}
+    }
+    if(hit)add(35,'انتحال علامة "'+hit.b+'"','النطاق الأساسي ('+p.reg+') يشبه العلامة أو يحتويها لكنه ليس نطاقها الرسمي.');
+    else{
+      const sb=BRANDS.find(b=>(p.sub+' '+p.u.pathname).toLowerCase().includes(b));
+      if(sb)add(30,'اسم علامة "'+sb+'" خارج النطاق الأساسي','الاسم موجود في النطاق الفرعي أو المسار، لكن الموقع الحقيقي هو '+p.reg+'.');
+    }
+  }
+  const score=Math.min(100,F.reduce((a,x)=>a+x.pts,0));
+  return{p,F:F.sort((a,b)=>b.pts-a.pts),score};
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function run(){
+  const raw=$('u').value.trim();if(!raw)return;
+  let r;try{r=analyze(raw)}catch(e){$('res').hidden=false;$('fc').hidden=true;$('ring').style.setProperty('--p',0);$('sc').textContent='؟';$('vt').textContent='رابط غير صالح';$('vd').textContent='تأكدي من كتابته كاملاً، مثل https://example.com';$('anat').textContent='';return}
+  const{p,F,score}=r;
+  const lvl=score>=55?['تصيد محتمل','var(--bad)','لا تفتحيه ولا تدخلي أي بيانات.']:score>=25?['مشبوه','var(--warn)','تحققي من المصدر عبر الموقع الرسمي قبل المتابعة.']:['لا مؤشرات واضحة','var(--ok)','هذا لا يعني أنه آمن، فقط الشكل لا يثير الشك.'];
+  $('res').hidden=false;$('fc').hidden=false;
+  $('ring').style.setProperty('--p',score);$('ring').style.setProperty('--c',lvl[1]);$('sc').textContent=score;
+  $('vt').textContent=lvl[0];$('vt').style.color=lvl[1];$('vd').textContent=lvl[2];
+  const u=p.u;
+  $('anat').innerHTML=(p.had?`<span class="a-p">${esc(u.protocol)}//</span>`:'')+(p.sub?`<span class="a-s">${esc(p.sub)}.</span>`:'')+`<span class="a-d">${esc(p.reg)}</span>`+(u.port?esc(':'+u.port):'')+`<span class="a-r">${esc(u.pathname+u.search)}</span>`;
+  $('fl').innerHTML=F.length?F.map(x=>`<li><div class="pt ${x.pts>=25?'':'m'}">+${x.pts}</div><div><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div></li>`).join(''):'<li><div class="pt z">0</div><div><b>لا توجد مؤشرات</b><span>الرابط لا يطابق أي قاعدة من القواعد المستخدمة.</span></div></li>';
+}
+$('go').onclick=run;$('u').onkeydown=e=>{if(e.key==='Enter')run()};
+$('ex').innerHTML=EX.map((x,i)=>`<button data-i="${i}">${esc(x.length>34?x.slice(0,34)+'…':x)}</button>`).join('');
+$('ex').onclick=e=>{const i=e.target.dataset.i;if(i!=null){$('u').value=EX[i];run()}};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t))});
+</script>
+</body>
+</html>
