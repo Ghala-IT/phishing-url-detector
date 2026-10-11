@@ -10,7 +10,7 @@
 
 A client-side tool that analyzes the structure of a URL and scores its phishing risk from 0 to 100, explaining every indicator it finds. Nothing is sent anywhere and the link is never opened.
 
-**Live demo:** https://YOUR-USERNAME.github.io/phishing-url-detector
+**Live demo:** (https://ghala-it.github.io/phishing-url-detector)
 
 ### Features
 - Risk score with three levels: likely phishing, suspicious, no clear signs
@@ -53,7 +53,7 @@ This is a rule-based heuristic that looks at the shape of the URL only. A well-b
 
 أداة تعمل داخل المتصفح تحلل شكل الرابط وتعطيه درجة خطورة تصيد من 0 إلى 100، مع شرح كل مؤشر تكتشفه. لا يُرسل شيء لأي جهة ولا يُفتح الرابط.
 
-**التجربة المباشرة:** https://YOUR-USERNAME.github.io/phishing-url-detector
+**التجربة المباشرة:** https://ghala-it.github.io/phishing-url-detector
 
 ### المميزات
 - درجة خطورة بثلاثة مستويات: تصيد محتمل، مشبوه، لا مؤشرات واضحة
