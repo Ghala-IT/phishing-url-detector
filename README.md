@@ -2,7 +2,8 @@
 
 **[English](#english) | [العربية](#العربية)**
 
-<img width="949" height="435" alt="لقطة شاشة 2026-10-11 214408" src="https://github.com/user-attachments/assets/4bc206cf-3efc-4094-ae5f-e3cb4be59509" />
+<img width="937" height="436" alt="لقطة شاشة 2026-10-11 221209" src="https://github.com/user-attachments/assets/ff58217a-a76c-4b4f-9a3a-d42c256b68e1" />
+
 
 
 ---
