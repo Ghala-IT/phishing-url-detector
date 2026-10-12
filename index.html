@@ -71,7 +71,7 @@ footer{max-width:920px;margin:0 auto 30px;padding:16px 18px;border-top:1px solid
       <button class="btn" id="go">افحصي</button>
     </div>
     <div class="chips" id="ex"></div>
-    <p class="hint" style="margin-top:10px">الأمثلة نصوص تجريبية صُنعت للتدريب فقط  .</p>
+    <p class="hint" style="margin-top:10px">الأمثلة نصوص تجريبية صُنعت للتدريب، لا تفتحيها.</p>
   </div>
   <div class="card" id="res" hidden>
     <div class="gauge"><div class="ring" id="ring"><b id="sc">0</b></div><div><h3 id="vt"></h3><p id="vd"></p></div></div>
@@ -115,7 +115,8 @@ footer{max-width:920px;margin:0 auto 30px;padding:16px 18px;border-top:1px solid
 
 <script>
 const $=id=>document.getElementById(id);
-const BRANDS=['paypal','google','apple','microsoft','amazon','facebook','instagram','netflix','whatsapp','alrajhibank','alahli','stcpay','absher','nafath','tabby','aramex','naqel','tawakkalna','binance','alinma','riyadbank','mobily','jarir','tamara','jahez','hungerstation','najiz','sadad','tiktok'];
+const BRANDS=['paypal','google','apple','microsoft','amazon','facebook','instagram','netflix','whatsapp','alrajhibank','alahli','stcpay','absher','nafath','tabby','aramex','naqel','tawakkalna','binance','alinma','riyadbank','mobily','jarir','tamara','jahez','hungerstation','najiz','sadad','tiktok','snapchat','youtube'];
+const OFFICIAL=['google.com','youtube.com','tiktok.com','paypal.com','apple.com','microsoft.com','amazon.com','amazon.sa','facebook.com','instagram.com','netflix.com','whatsapp.com','snapchat.com','binance.com','alrajhibank.com.sa','alahli.com','alinma.com','riyadbank.com','aramex.com','jarir.com','mobily.com.sa','tabby.ai','nafath.sa','absher.gov.sa'];
 const KW=['login','signin','verify','secure','account','update','confirm','password','bank','wallet','billing','suspend','unlock','otp','refund','gift','claim'];
 const RISKY=['xyz','top','tk','ml','ga','cf','gq','click','zip','mov','icu','cyou','buzz','rest','work','support','live'];
 const SHORT=['bit.ly','tinyurl.com','t.co','goo.gl','is.gd','cutt.ly','rb.gy','shorturl.at','ow.ly'];
@@ -139,7 +140,7 @@ function analyze(raw){
   if(p.isIP)add(30,'عنوان IP بدل اسم نطاق','المواقع الرسمية نادراً تُفتح بعنوان رقمي.');
   if(p.u.username||p.u.password)add(25,'رمز @ داخل الرابط','المتصفح يتجاهل ما قبل @ ويذهب للنطاق الذي بعده: '+p.host);
   if(p.host.includes('xn--'))add(25,'نطاق Punycode','قد يحتوي أحرفاً تشبه اللاتينية لكنها من لغة أخرى.');
-  if(raw.length>75)add(10,'رابط طويل جداً ('+raw.length+' حرف)','الطول يُستخدم لإخفاء النطاق الحقيقي.');
+  if(raw.length>150&&!OFFICIAL.includes(p.reg))add(10,'رابط طويل جداً ('+raw.length+' حرف)','الطول يُستخدم لإخفاء النطاق الحقيقي.');
   const sl=p.sub?p.sub.split('.').length:0;
   if(sl>=3)add(12,'نطاقات فرعية كثيرة ('+sl+')','يُستخدم لإضافة أسماء توحي بالثقة قبل النطاق الحقيقي.');
   const hy=(p.main.match(/-/g)||[]).length;
@@ -148,10 +149,12 @@ function analyze(raw){
   if(/^\/\/|[^:]\/\//.test(p.u.pathname+p.u.search))add(8,'// مكررة داخل المسار','قد تدل على إعادة توجيه.');
   if(RISKY.includes(p.tld))add(12,'نطاق علوي كثير الاستغلال (.'+p.tld+')','رخيص ويكثر في الحملات الاحتيالية.');
   if(SHORT.includes(p.reg))add(15,'رابط مختصر','لا يمكن معرفة الوجهة الحقيقية قبل فتحه.');
+  const off=OFFICIAL.includes(p.reg);
   const all=(p.host+p.u.pathname+p.u.search).toLowerCase();
   const kws=KW.filter(k=>all.includes(k));
-  if(kws.length)add(Math.min(18,kws.length*6),'كلمات استعجال أو دخول: '+kws.join(', '),'تُستخدم لدفعك لإدخال بياناتك.');
-  if(!p.isIP){
+  if(kws.length&&!off)add(Math.min(18,kws.length*6),'كلمات استعجال أو دخول: '+kws.join(', '),'تُستخدم لدفعك لإدخال بياناتك.');
+  if(off)add(0,'نطاق رسمي معروف ('+p.reg+')','النطاق الأساسي مطابق لموقع رسمي، فلم تُطبَّق فحوصات الانتحال. انتبهي فقط لروابط النماذج أو الاستضافة على منصات كبيرة، فقد يستغلها المحتالون.');
+  if(!p.isIP&&!off){
     const clean=[p.main,unleet(p.main,'l'),unleet(p.main,'i')].map(x=>x.replace(/-/g,''));
     const parts=p.main.split('-').flatMap(x=>[x,unleet(x,'l'),unleet(x,'i')]);
     let hit=null;
@@ -162,8 +165,10 @@ function analyze(raw){
     }
     if(hit)add(35,'انتحال علامة "'+hit.b+'"','النطاق الأساسي ('+p.reg+') يشبه العلامة أو يحتويها لكنه ليس نطاقها الرسمي.');
     else{
-      const sb=BRANDS.find(b=>(p.sub+' '+p.u.pathname).toLowerCase().includes(b));
-      if(sb)add(30,'اسم علامة "'+sb+'" خارج النطاق الأساسي','الاسم موجود في النطاق الفرعي أو المسار، لكن الموقع الحقيقي هو '+p.reg+'.');
+      const sb=BRANDS.find(b=>p.sub.toLowerCase().includes(b));
+      if(sb)add(30,'اسم علامة "'+sb+'" في النطاق الفرعي','الاسم موجود قبل النطاق الأساسي، لكن الموقع الحقيقي هو '+p.reg+'.');
+      else{const pb=BRANDS.find(b=>p.u.pathname.toLowerCase().includes(b));
+      if(pb)add(8,'اسم علامة "'+pb+'" في المسار','قد يكون طبيعياً (مثل روابط البحث)، لكن المحتالين يستخدمونه لإيهامك. الموقع الحقيقي هو '+p.reg+'.')}
     }
   }
   const score=Math.min(100,F.reduce((a,x)=>a+x.pts,0));
@@ -171,16 +176,17 @@ function analyze(raw){
 }
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function run(){
-  const raw=$('u').value.trim();if(!raw)return;
+  const full=$('u').value.trim();if(!full)return;
+  const raw=full.split(/\s+/)[0];
   let r;try{r=analyze(raw)}catch(e){$('res').hidden=false;$('fc').hidden=true;$('ring').style.setProperty('--p',0);$('sc').textContent='؟';$('vt').textContent='رابط غير صالح';$('vd').textContent='تأكدي من كتابته كاملاً، مثل https://example.com';$('anat').textContent='';return}
   const{p,F,score}=r;
   const lvl=score>=55?['تصيد محتمل','var(--bad)','لا تفتحيه ولا تدخلي أي بيانات.']:score>=25?['مشبوه','var(--warn)','تحققي من المصدر عبر الموقع الرسمي قبل المتابعة.']:['لا مؤشرات واضحة','var(--ok)','هذا لا يعني أنه آمن، فقط الشكل لا يثير الشك.'];
   $('res').hidden=false;$('fc').hidden=false;
   $('ring').style.setProperty('--p',score);$('ring').style.setProperty('--c',lvl[1]);$('sc').textContent=score;
-  $('vt').textContent=lvl[0];$('vt').style.color=lvl[1];$('vd').textContent=lvl[2];
+  $('vt').textContent=lvl[0];$('vt').style.color=lvl[1];$('vd').textContent=lvl[2]+(raw!==full?' (فحصنا أول رابط فقط من النص الملصوق)':'');
   const u=p.u;
   $('anat').innerHTML=(p.had?`<span class="a-p">${esc(u.protocol)}//</span>`:'')+(p.sub?`<span class="a-s">${esc(p.sub)}.</span>`:'')+`<span class="a-d">${esc(p.reg)}</span>`+(u.port?esc(':'+u.port):'')+`<span class="a-r">${esc(u.pathname+u.search)}</span>`;
-  $('fl').innerHTML=F.length?F.map(x=>`<li><div class="pt ${x.pts>=25?'':'m'}">+${x.pts}</div><div><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div></li>`).join(''):'<li><div class="pt z">0</div><div><b>لا توجد مؤشرات</b><span>الرابط لا يطابق أي قاعدة من القواعد المستخدمة.</span></div></li>';
+  $('fl').innerHTML=F.length?F.map(x=>`<li><div class="pt ${x.pts>=25?'':x.pts===0?'z':'m'}">+${x.pts}</div><div><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div></li>`).join(''):'<li><div class="pt z">0</div><div><b>لا توجد مؤشرات</b><span>الرابط لا يطابق أي قاعدة من القواعد المستخدمة.</span></div></li>';
 }
 $('go').onclick=run;$('u').onkeydown=e=>{if(e.key==='Enter')run()};
 $('ex').innerHTML=EX.map((x,i)=>`<button data-i="${i}">${esc(x.length>34?x.slice(0,34)+'…':x)}</button>`).join('');
